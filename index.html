@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Administrador personal de salario, gastos, límites, emergencias y metas de ahorro.">
+  <title>Gestor de Gastos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="light">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">$</span>
+        <div>
+          <strong>Gestor de Gastos</strong>
+          <small>Tu dinero, bajo control</small>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <span class="month-pill" id="monthChip">Mes</span>
+        <div class="theme-switcher" role="group" aria-label="Modo visual">
+          <button type="button" class="theme-btn" data-theme-option="light" aria-label="Modo claro" title="Modo claro" aria-pressed="true">
+            <span aria-hidden="true">☀</span>
+          </button>
+          <button type="button" class="theme-btn" data-theme-option="dark" aria-label="Modo oscuro" title="Modo oscuro" aria-pressed="false">
+            <span aria-hidden="true">☾</span>
+          </button>
+          <button type="button" class="theme-btn" data-theme-option="brutal" aria-label="Modo brutalista" title="Modo brutalista" aria-pressed="false">
+            <span aria-hidden="true">▣</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Resumen principal">
+      <article class="card balance-card">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Saldo disponible</p>
+            <h1 id="balanceAmount" class="balance-amount" aria-live="polite">$0</h1>
+          </div>
+          <span class="status-badge" id="balanceStatus">Mes activo</span>
+        </div>
+        <p class="muted" id="balanceCaption">Saldo después de ingresos, gastos, emergencias y metas.</p>
+
+        <div class="balance-grid">
+          <div class="stat">
+            <span>Ingresos</span>
+            <strong id="statIncome">$0</strong>
+          </div>
+          <div class="stat">
+            <span>Gastos</span>
+            <strong id="statExpenses">$0</strong>
+          </div>
+          <div class="stat">
+            <span>Emergencias</span>
+            <strong id="statEmergency">$0</strong>
+          </div>
+          <div class="stat">
+            <span>Metas</span>
+            <strong id="statGoals">$0</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="card summary-card">
+        <p class="eyebrow">Resumen rápido</p>
+        <h2>Control del mes</h2>
+        <ul class="summary-list">
+          <li><span>Gastos fijos</span><strong id="statFixedExpenses">$0</strong></li>
+          <li><span>Gastos extras</span><strong id="statExtraExpenses">$0</strong></li>
+          <li><span>Fondo de emergencias</span><strong id="summaryEmergencyFund">$0</strong></li>
+          <li><span>Metas activas</span><strong id="summaryGoalCount">0</strong></li>
+        </ul>
+        <button type="button" class="btn btn-outline btn-full" id="closeMonthBtn">Cerrar mes y archivar</button>
+        <p class="fine-print">El cierre también se hace automáticamente cuando cambias de mes.</p>
+      </article>
+    </section>
+
+    <section class="alerts-stack" id="alertsRegion" aria-live="polite" aria-label="Alertas de gastos"></section>
+
+    <div class="layout">
+      <div class="main-column">
+        <section class="card" id="incomeSection" aria-labelledby="incomeTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">01 · Entradas</p>
+              <h2 id="incomeTitle">Ingresos</h2>
+            </div>
+          </div>
+
+          <form id="incomeForm" class="form-grid">
+            <label>
+              Motivo o descripción
+              <input name="description" type="text" maxlength="60" required placeholder="Ej. Nómina">
+            </label>
+            <label>
+              Monto
+              <input name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00" inputmode="decimal">
+            </label>
+            <label>
+              Tipo
+              <select name="type" id="incomeType">
+                <option value="fixed">Fijo</option>
+                <option value="extra">Extra</option>
+              </select>
+            </label>
+            <label>
+              Categoría
+              <select name="category" id="incomeCategory"></select>
+            </label>
+            <label>
+              Fecha
+              <input name="date" id="incomeDate" type="date" required>
+            </label>
+            <button type="submit" class="btn btn-primary align-end">Registrar ingreso</button>
+          </form>
+
+          <div class="entry-list" id="incomeList"></div>
+        </section>
+
+        <section class="card" id="expenseSection" aria-labelledby="expenseTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">02 · Salidas</p>
+              <h2 id="expenseTitle">Gastos</h2>
+            </div>
+          </div>
+
+          <form id="expenseForm" class="form-grid">
+            <label>
+              Descripción
+              <input name="description" type="text" maxlength="60" required placeholder="Ej. Arriendo">
+            </label>
+            <label>
+              Monto
+              <input name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00" inputmode="decimal">
+            </label>
+            <label>
+              Tipo
+              <select name="type" id="expenseType">
+                <option value="fixed">Fijo</option>
+                <option value="extra">Extra</option>
+              </select>
+            </label>
+            <label>
+              Categoría
+              <select name="category" id="expenseCategory"></select>
+            </label>
+            <label>
+              Fecha
+              <input name="date" id="expenseDate" type="date" required>
+            </label>
+            <button type="submit" class="btn btn-primary align-end">Registrar gasto</button>
+          </form>
+
+          <div class="entry-list" id="expenseList"></div>
+        </section>
+
+        <section class="card" id="goalSection" aria-labelledby="goalsTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">03 · Ahorro</p>
+              <h2 id="goalsTitle">Metas de ahorro</h2>
+            </div>
+          </div>
+
+          <form id="goalForm" class="form-grid">
+            <label>
+              Nombre de la meta
+              <input name="name" type="text" maxlength="50" required placeholder="Ej. Viaje">
+            </label>
+            <label>
+              Objetivo
+              <input name="target" type="number" min="1" step="0.01" required placeholder="0.00" inputmode="decimal">
+            </label>
+            <label>
+              Aporte mensual
+              <input name="monthlyContribution" type="number" min="0.01" step="0.01" required placeholder="0.00" inputmode="decimal">
+            </label>
+            <button type="submit" class="btn btn-primary align-end">Crear meta</button>
+          </form>
+
+          <div class="goals-grid" id="goalList"></div>
+        </section>
+
+        <section class="card" id="limitsSection" aria-labelledby="limitsTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Control</p>
+              <h2 id="limitsTitle">Límites de gasto</h2>
+            </div>
+          </div>
+
+          <form id="limitsForm" class="form-grid form-grid-limits">
+            <label>
+              Límite semanal
+              <input id="limitWeekly" name="weekly" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+            </label>
+            <label>
+              Límite quincenal
+              <input id="limitFortnightly" name="fortnightly" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+            </label>
+            <label>
+              Límite mensual
+              <input id="limitMonthly" name="monthly" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+            </label>
+            <button type="submit" class="btn btn-primary align-end">Guardar límites</button>
+          </form>
+
+          <div class="limits-grid" id="limitsGrid"></div>
+        </section>
+      </div>
+
+      <aside class="side-column" aria-label="Panel lateral">
+        <section class="card emergency-card" id="emergencySection" aria-labelledby="emergencyTitle">
+          <p class="eyebrow">Protección</p>
+          <h2 id="emergencyTitle">Emergencias e imprevistos</h2>
+
+          <p class="emergency-fund" id="emergencyFund">$0</p>
+          <p class="muted">Fondo acumulado en meses cerrados.</p>
+
+          <form id="allocationForm" class="allocation-form">
+            <label>
+              Destinar este mes
+              <input name="amount" id="emergencyAllocation" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+            </label>
+            <button type="submit" class="btn btn-primary align-end">Guardar</button>
+          </form>
+
+          <div class="emergency-stats">
+            <div class="stat">
+              <span>Aportado ahora</span>
+              <strong id="emergencyThisMonth">$0</strong>
+            </div>
+            <div class="stat">
+              <span>Proyección al cerrar</span>
+              <strong id="emergencyProjection">$0</strong>
+            </div>
+          </div>
+
+          <p class="fine-print">Si sobra dinero al finalizar el mes, se agrega automáticamente a este fondo.</p>
+        </section>
+
+        <section class="card stats-card" id="statsSection" aria-labelledby="statsTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Estadísticas</p>
+              <h2 id="statsTitle">Diagrama de barras</h2>
+            </div>
+          </div>
+
+          <div class="chart-block">
+            <span class="chart-title">Distribución del mes</span>
+            <div class="chart-bars" id="monthChart"></div>
+          </div>
+
+          <div class="chart-block">
+            <div class="chart-head">
+              <span class="chart-title">Últimos meses</span>
+              <span class="chart-legend">
+                <i class="legend-dot legend-income" aria-hidden="true"></i> Ingresos
+                <i class="legend-dot legend-expense" aria-hidden="true"></i> Gastos
+              </span>
+            </div>
+            <div class="history-chart" id="historyChart"></div>
+          </div>
+        </section>
+
+        <section class="card" id="historySection" aria-labelledby="historyTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Archivo</p>
+              <h2 id="historyTitle">Historial mensual</h2>
+            </div>
+          </div>
+          <div class="history-table-wrapper" id="historyList"></div>
+        </section>
+
+        <section class="card reset-card" id="rulesSection" aria-labelledby="rulesTitle">
+          <p class="eyebrow">Cómo funciona</p>
+          <h2 id="rulesTitle">Cierre automático</h2>
+          <ul class="rules-list">
+            <li>El saldo descuenta gastos, emergencias y aportes a metas.</li>
+            <li>Una alerta aparece cuando un gasto llega al 90% de su límite.</li>
+            <li>Al cerrar el mes se guardan ingresos, gastos, emergencias y metas.</li>
+          </ul>
+          <button type="button" class="btn btn-danger btn-full" data-action="reset-all">Reiniciar datos y gastos</button>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <p>Datos guardados solo en tu navegador · Sin frameworks ni servicios externos</p>
+  </footer>
+
+  <dialog class="reset-dialog" id="resetDialog" aria-labelledby="resetDialogTitle">
+    <form class="reset-form" id="resetForm" novalidate>
+      <div class="modal-icon" aria-hidden="true">🔒</div>
+      <div>
+        <p class="eyebrow">Acceso protegido</p>
+        <h2 id="resetDialogTitle">Confirmar reinicio</h2>
+      </div>
+      <p>Esta acción borrará ingresos, gastos, metas e historial. Ingresa la clave de seguridad para continuar.</p>
+
+      <label>
+        Clave de seguridad
+        <input name="pin" id="resetPin" type="password" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="•••••" required>
+      </label>
+
+      <p class="modal-error" id="resetError" role="alert" hidden></p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" data-action="cancel-reset">Cancelar</button>
+        <button type="submit" class="btn btn-danger">Reiniciar todo</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
