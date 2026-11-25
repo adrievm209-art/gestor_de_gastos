@@ -17,6 +17,7 @@
 
 - Balance = month income − month expenses − month `goalTransactions` − effective emergency allocation. The emergency allocation is clamped to the balance available after expenses and goals.
 - Limit inputs render blank when the value is `0`; `Actions.setLimits` treats an empty string as `0`. Do not repopulate zeros in `Render.controls`.
+- `Calculations.periodExtraExpenses` counts only `type === 'extra'` expenses in the current period; fixed expenses never trigger limit alerts.
 - Goal monthly contributions are stored as `goalTransactions` (`source: 'monthly'`) created at goal creation and on rollover. Do not reapply a month that already has one; deleting a goal also removes its transactions.
 - `Cycle.closeMonth` archives totals once per month (idempotent via `history`) and adds reserved emergency plus any positive leftover to `emergencyFund`. Rollover runs on load when the stored month is behind today.
 - Reset is gated by `<dialog id="resetDialog">` and PIN **`12345`**. Keep the dialog/error UX rather than reverting to `window.confirm`.

@@ -649,6 +649,10 @@ select:focus {
   color: var(--text);
 }
 
+.limits-note {
+  margin: -6px 0 14px;
+}
+
 .limits-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

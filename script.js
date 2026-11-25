@@ -393,16 +393,21 @@
       return Utils.round(Calculations.effectiveEmergency(state, month) + Calculations.leftover(state, month));
     },
 
-    periodExpenses(state, period) {
+    periodExtraExpenses(state, period) {
       const bounds = Utils.getPeriodBounds(state.currentMonth, period);
       return Utils.round(state.expenses
-        .filter((item) => item.month === state.currentMonth && item.date >= bounds.start && item.date <= bounds.end)
+        .filter((item) => (
+          item.month === state.currentMonth
+          && item.type === 'extra'
+          && item.date >= bounds.start
+          && item.date <= bounds.end
+        ))
         .reduce((total, item) => total + Number(item.amount || 0), 0));
     },
 
     limitStatus(state, period) {
       const limit = Math.max(0, Number(state.limits[period]) || 0);
-      const spent = Calculations.periodExpenses(state, period);
+      const spent = Calculations.periodExtraExpenses(state, period);
       const percent = limit > 0 ? (spent / limit) * 100 : 0;
       return { limit, spent, percent, isAlert: limit > 0 && percent >= 90 };
     },
