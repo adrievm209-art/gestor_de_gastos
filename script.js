@@ -25,8 +25,14 @@
       extra: ['Bonificación', 'Reembolso', 'Venta', 'Regalo', 'Otros ingresos extra']
     },
     expense: {
-      fixed: ['Arriendo', 'Mercado', 'Suscripciones', 'Mensualidades', 'Créditos por pagar'],
-      extra: ['Salidas', 'Emergencias', 'Regalos', 'Caprichos']
+      fixed: [
+        'Arriendo', 'Mercado', 'Suscripciones', 'Mensualidades', 'Créditos por pagar',
+        'Servicios públicos', 'Transporte', 'Seguros', 'Internet', 'Educación'
+      ],
+      extra: [
+        'Salidas', 'Emergencias', 'Regalos', 'Caprichos', 'Ocio',
+        'Viajes', 'Restaurantes', 'Compras', 'Salud', 'Mascotas'
+      ]
     }
   };
 
@@ -585,9 +591,13 @@
     },
 
     setLimits(form) {
-      const weekly = Utils.parseAmount(form.elements.namedItem('weekly').value);
-      const fortnightly = Utils.parseAmount(form.elements.namedItem('fortnightly').value);
-      const monthly = Utils.parseAmount(form.elements.namedItem('monthly').value);
+      const readLimit = (name) => {
+        const raw = form.elements.namedItem(name).value.trim();
+        return raw === '' ? 0 : Utils.parseAmount(raw);
+      };
+      const weekly = readLimit('weekly');
+      const fortnightly = readLimit('fortnightly');
+      const monthly = readLimit('monthly');
       const values = [weekly, fortnightly, monthly];
 
       if (values.some((value) => !Number.isFinite(value) || value < 0)) {
@@ -850,9 +860,11 @@
 
     controls() {
       const state = Actions.state;
-      document.getElementById('limitWeekly').value = state.limits.weekly;
-      document.getElementById('limitFortnightly').value = state.limits.fortnightly;
-      document.getElementById('limitMonthly').value = state.limits.monthly;
+      const limitValue = (value) => (Number(value) > 0 ? String(value) : '');
+
+      document.getElementById('limitWeekly').value = limitValue(state.limits.weekly);
+      document.getElementById('limitFortnightly').value = limitValue(state.limits.fortnightly);
+      document.getElementById('limitMonthly').value = limitValue(state.limits.monthly);
       document.getElementById('emergencyAllocation').value = Calculations.configuredEmergency(state);
     },
 
@@ -902,7 +914,7 @@
         const percent = Math.round(status.percent);
         alerts.push({
           type: percent >= 100 ? 'danger' : 'warning',
-          icon: percent >= 100 ? '⛔' : '⚠️',
+          icon: percent >= 100 ? '!' : '⚠',
           title: `Límite ${period.label} al ${percent}%`,
           text: `Llevas ${Utils.formatCurrency(status.spent)} de ${Utils.formatCurrency(status.limit)}. Estás en la zona de alerta.`
         });
@@ -912,7 +924,7 @@
       if (balance < 0) {
         alerts.push({
           type: 'danger',
-          icon: '📉',
+          icon: '!',
           title: 'Saldo en negativo',
           text: `Debes ${Utils.formatCurrency(Math.abs(balance))} para equilibrar este mes.`
         });
@@ -921,7 +933,7 @@
       if (alerts.length === 0) {
         alerts.push({
           type: 'success',
-          icon: '✅',
+          icon: '✓',
           title: 'Todo bajo control',
           text: 'Ningún límite ha llegado al 90% y tu saldo es positivo.'
         });
@@ -929,7 +941,7 @@
 
       document.getElementById('alertsRegion').innerHTML = alerts.map((alert) => `
         <div class="alert alert--${alert.type}">
-          <span class="alert-icon" aria-hidden="true">${alert.icon}</span>
+          <span class="alert-icon alert-icon--${alert.type}" aria-hidden="true">${alert.icon}</span>
           <div>
             <strong>${Utils.escapeHtml(alert.title)}</strong>
             <p>${Utils.escapeHtml(alert.text)}</p>

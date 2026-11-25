@@ -386,30 +386,13 @@ main {
 #historySection { grid-area: history; }
 #rulesSection { grid-area: rules; }
 
-body[data-theme="light"] .layout {
+/* Distribución única: todos los modos usan el mismo orden de paneles */
+.layout {
   grid-template-areas:
     "income emergency"
     "expense stats"
     "limits history"
     "goals rules";
-}
-
-body[data-theme="dark"] .layout {
-  grid-template-areas:
-    "income stats"
-    "expense stats"
-    "limits emergency"
-    "goals history"
-    "rules rules";
-}
-
-body[data-theme="brutal"] .layout {
-  grid-template-areas:
-    "income emergency"
-    "expense history"
-    "goals history"
-    "limits stats"
-    "rules rules";
 }
 
 /* Modelo claro: tablero clásico y amplio */
@@ -625,8 +608,34 @@ select:focus {
 }
 
 .alert-icon {
-  font-size: 1.2rem;
-  line-height: 1.2;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: var(--border-width) solid var(--border);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.alert-icon--success {
+  border-color: var(--success);
+  background: var(--success);
+  color: var(--on-primary);
+}
+
+.alert-icon--warning {
+  border-color: var(--warning);
+  background: var(--warning);
+  color: #111111;
+}
+
+.alert-icon--danger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #ffffff;
 }
 
 .alert strong {
@@ -1288,7 +1297,9 @@ body[data-theme="brutal"] .mini-bar {
 body[data-theme="brutal"] .pill,
 body[data-theme="brutal"] .month-pill,
 body[data-theme="brutal"] .status-badge,
-body[data-theme="brutal"] .goal-badge {
+body[data-theme="brutal"] .goal-badge,
+body[data-theme="brutal"] .alert-icon,
+body[data-theme="brutal"] .toast-icon {
   border-radius: 0;
 }
 
@@ -1301,7 +1312,7 @@ body[data-theme="brutal"] .goal-badge {
     grid-template-columns: 1fr;
   }
 
-  body[data-theme="light"] .layout {
+  .layout {
     grid-template-areas:
       "income"
       "emergency"
@@ -1310,30 +1321,6 @@ body[data-theme="brutal"] .goal-badge {
       "limits"
       "history"
       "goals"
-      "rules";
-  }
-
-  body[data-theme="dark"] .layout {
-    grid-template-areas:
-      "income"
-      "stats"
-      "expense"
-      "limits"
-      "emergency"
-      "goals"
-      "history"
-      "rules";
-  }
-
-  body[data-theme="brutal"] .layout {
-    grid-template-areas:
-      "income"
-      "emergency"
-      "expense"
-      "history"
-      "goals"
-      "stats"
-      "limits"
       "rules";
   }
 }
